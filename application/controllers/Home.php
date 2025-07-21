@@ -67,6 +67,41 @@ class Home extends CI_Controller {
 
         redirect('home');
     }
+    public function register()
+    {
+    $this->load->view('register'); // Buat file views/register.php
+    }
+    public function register_aksi()
+    {
+    $nama      = $this->input->post('nama');
+    $username  = $this->input->post('username');
+    $password  = $this->input->post('password');
+    $konf      = $this->input->post('konfirmasi');
+
+    if ($password != $konf) {
+        $this->session->set_flashdata('pesan', 'Konfirmasi password tidak cocok.');
+        redirect('home/register');
+    }
+
+    $cek = $this->M_model->get_where('tb_user', ['username' => $username]);
+    if ($cek->num_rows() > 0) {
+        $this->session->set_flashdata('pesan', 'Username sudah digunakan.');
+        redirect('home/register');
+    }
+
+    $data = [
+        'nama'     => $nama,
+        'username' => $username,
+        'password' => md5($password),
+        'level'    => 'User',
+        'login'    => 'Ya'
+    ];
+
+    $this->M_model->insert('tb_user', $data);
+    $this->session->set_flashdata('pesan', 'Registrasi berhasil. Silakan login.');
+    redirect('home');
+    }
+
 
     public function logout()
     {
